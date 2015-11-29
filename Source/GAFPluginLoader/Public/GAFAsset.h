@@ -18,12 +18,10 @@ private:
     FGAFTimelinePtr     RootTimeline;
     FGAFHeader          Header;
 
-    uint32            SceneFps;
-    uint32            SceneWidth;
-    uint32            SceneHeight;
-    FColor            SceneColor;
 
     void SetRootTimeline(FGAFTimelinePtr tl);
+
+    void _InstantiateObject(uint32 id, FGAFCharacterType type, uint32 reference, bool mask, UBlueprint* BlueprintObject);
 public:
 
     ~UGAFAsset();
@@ -50,12 +48,20 @@ public:
 
     bool        InitWithGAFData(const uint8_t* data, uint32_t len, const FString& longPath);
 
-    uint32 GetSceneFps() const;
-    uint32 GetSceneWidth() const;
-    uint32 GetSceneHeight() const;
-    const FColor& GetSceneColor() const;
+    UPROPERTY(EditAnywhere, Category=Data)
+    uint32            SceneFps;
+    UPROPERTY(EditAnywhere, Category = Data)
+    uint32            SceneWidth;
+    UPROPERTY(EditAnywhere, Category = Data)
+    uint32            SceneHeight;
+    UPROPERTY(EditAnywhere, Category = Data)
+    FColor            SceneColor;
+
     void SetSceneFps(uint32);
     void SetSceneWidth(uint32);
     void SetSceneHeight(uint32);
     void SetSceneColor(const FColor&);
+
+    void InstantiateObject(const FGAFAnimationObjects_t& Objs, const FGAFAnimationMasks_t& Masks, UBlueprint* BlueprintObject);
+    void ConstructObject(UBlueprint* BlueprintObject);
 };

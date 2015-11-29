@@ -188,7 +188,7 @@ FGAFTextureAtlas* FGAFTimeline::GetTextureAtlas()
 
 void FGAFTimeline::LoadImages(float desiredAtlasScale)
 {
-    if (TextureAtlases.Num() > 0)
+    if (TextureAtlases.Num() == 0)
     {
         CurrentTextureAtlas = nullptr;
         UsedAtlasContentScaleFactor = desiredAtlasScale;

@@ -28,7 +28,7 @@ private:
     uint32                      FramesCount;
     FString                     LinkageName;
 
-    FGAFTextureAtlas*           CurrentTextureAtlas;
+    FGAFTextureAtlas*           CurrentTextureAtlas = nullptr;
 
     float                       UsedAtlasContentScaleFactor;
 

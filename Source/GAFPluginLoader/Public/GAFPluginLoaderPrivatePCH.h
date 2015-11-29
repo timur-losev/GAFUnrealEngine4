@@ -6,6 +6,7 @@
 #include <list>
 #include <limits>
 
+DECLARE_LOG_CATEGORY_EXTERN(LogGAFAsset, Log, All);
 
 #define ForwardSharedPointer(__class__)\
 class __class__;\

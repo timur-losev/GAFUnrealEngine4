@@ -18,7 +18,8 @@ public class GAFPluginLoader : ModuleRules
                 "Paper2DEditor",
                 "AssetTools",
                 "ContentBrowser",
-                "EditorStyle"
+                "EditorStyle",
+                "ProceduralMeshComponent"
             });
 
         PrivateIncludePaths.AddRange(
@@ -29,7 +30,8 @@ public class GAFPluginLoader : ModuleRules
         PrivateIncludePathModuleNames.AddRange(
                 new string[] {
                 "AssetTools",
-                "AssetRegistry"
+                "AssetRegistry",
+                "ProceduralMeshComponent"
             });
 
         PublicIncludePaths.AddRange(

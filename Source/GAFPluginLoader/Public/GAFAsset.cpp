@@ -5,6 +5,14 @@
 #include "GAFTimeline.h"
 #include "GAFLoader.h"
 #include "GAFTextureAtlas.h"
+#include "GAFTextureAtlasElement.h"
+
+#include "ProceduralMeshComponent.h"
+#include "KismetProceduralMeshLibrary.h"
+
+
+
+DEFINE_LOG_CATEGORY(LogGAFAsset);
 
 UGAFAsset::UGAFAsset(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer)
@@ -38,9 +46,17 @@ void UGAFAsset::Serialize(FArchive& Ar)
 {
     Super::Serialize(Ar);
 
+    const bool IsLoading = Ar.IsLoading();
+    const bool IsSaving = Ar.IsSaving();
+
     if (Ar.IsLoading() && Ar.UE4Ver() < VER_UE4_ASSET_IMPORT_DATA_AS_JSON && !AssetImportData)
     {
         AssetImportData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
+    }
+
+    if (IsSaving)
+    {
+
     }
 }
 
@@ -86,6 +102,60 @@ bool UGAFAsset::SetRootTimeline(uint32 id)
     return false;
 }
 
+void UGAFAsset::_InstantiateObject(uint32 Id, FGAFCharacterType Type, uint32 Reference, bool Mask, UBlueprint* BlueprintObject)
+{
+    if (Type == FGAFCharacterType::Timeline)
+    {
+        UE_LOG(LogGAFAsset, Log, TEXT("Timeline reached"));
+    }
+    else if (Type == FGAFCharacterType::Texture)
+    {
+        UE_LOG(LogGAFAsset, Log, TEXT("Texture reached"));
+
+        FGAFTextureAtlas* Atlas = RootTimeline->GetTextureAtlas();
+        const auto& ElementsMap = Atlas->GetElements();
+        const FGAFTextureAtlasElement* Element = *ElementsMap.Find(Reference);
+
+        check(Element != nullptr);
+
+        FString NodeName = TEXT("Test") + FString::FromInt(Id);
+
+        static bool bIsRootAdded = false;
+
+        if (!bIsRootAdded)
+        {
+            USCS_Node* DefaultSceneRootNode =
+                BlueprintObject->SimpleConstructionScript->CreateNode(
+                    USceneComponent::StaticClass(), TEXT("DefaultSceneRootNode"));
+
+            CastChecked<USceneComponent>(DefaultSceneRootNode->ComponentTemplate)->bVisualizeComponent = true;
+
+            BlueprintObject->SimpleConstructionScript->AddNode(DefaultSceneRootNode);
+
+            bIsRootAdded = true;
+        }
+
+        USCS_Node* ProceduralQuadNodeScriptNode =
+            BlueprintObject->SimpleConstructionScript->CreateNode(
+                UProceduralMeshComponent::StaticClass(), FName(*NodeName));
+
+        CastChecked<USceneComponent>(ProceduralQuadNodeScriptNode->ComponentTemplate)->bVisualizeComponent = true;
+        BlueprintObject->SimpleConstructionScript->AddNode(ProceduralQuadNodeScriptNode);
+
+        {
+            TArray<FVector> Vertices;
+            TArray<int32> Indeces;
+            TArray<FVector> Normals;
+            TArray<FVector2D> UVs;
+            TArray<FProcMeshTangent> Tangents;
+            UKismetProceduralMeshLibrary::GenerateQuad(Element->Bounds.Size.Width, Element->Bounds.Size.Height, Vertices, Indeces, Normals, UVs, Tangents);
+
+            UProceduralMeshComponent* ProceduralMesh = CastChecked<UProceduralMeshComponent>(ProceduralQuadNodeScriptNode->ComponentTemplate);
+            ProceduralMesh->CreateMeshSection(0, Vertices, Indeces, Normals, UVs, TArray<FColor>(), Tangents, false);
+        }
+    }
+}
+
 UGAFAsset::~UGAFAsset()
 {
     GAF_RELEASE_ARRAY(FGAFTextureAtlases_t, TextureAtlases);
@@ -110,26 +180,6 @@ bool UGAFAsset::InitWithGAFData(const uint8_t* data, uint32_t len, const FString
     return true;
 }
 
-uint32 UGAFAsset::GetSceneFps() const
-{
-    return SceneFps;
-}
-
-uint32 UGAFAsset::GetSceneWidth() const
-{
-    return SceneWidth;
-}
-
-uint32 UGAFAsset::GetSceneHeight() const
-{
-    return SceneHeight;
-}
-
-const FColor& UGAFAsset::GetSceneColor() const
-{
-    return SceneColor;
-}
-
 void UGAFAsset::SetSceneFps(uint32 v)
 {
     SceneFps = v;
@@ -148,6 +198,28 @@ void UGAFAsset::SetSceneHeight(uint32 v)
 void UGAFAsset::SetSceneColor(const FColor& v)
 {
     SceneColor = v;
+}
+
+void UGAFAsset::InstantiateObject(const FGAFAnimationObjects_t& Objs, const FGAFAnimationMasks_t& Masks, UBlueprint* BlueprintObject)
+{
+    RootTimeline->LoadImages(1);
+
+    for (const FGAFAnimationObjects_t::value_type& AnimObjectPair : Objs)
+    {
+        const FGAFAnimationObjectEx_t& AnimObject = AnimObjectPair.second;
+        FGAFCharacterType CharacterType = std::get<1>(AnimObject);
+        uint32 Reference = std::get<0>(AnimObject);
+        uint32 ObjectId = AnimObjectPair.first;
+
+        check(BlueprintObject != nullptr);
+
+        _InstantiateObject(ObjectId, CharacterType, Reference, false, BlueprintObject);
+    }
+}
+
+void UGAFAsset::ConstructObject(UBlueprint* BlueprintObject)
+{
+    InstantiateObject(RootTimeline->GetAnimationObjects(), RootTimeline->GetAnimationMasks(), BlueprintObject);
 }
 
 #endif
