@@ -20,6 +20,7 @@ struct FTags
         TagDefineTimeline = 13,
         TagDefineSounds = 14,
         TagDefineAtlas3 = 15,
+        TagDefineTimeline2 = 17
     };
 
     static FString ToString(Enum e)
@@ -74,8 +75,11 @@ struct FTags
         case FTags::TagDefineAtlas3:
             return TEXT("TagDefineAtlas3");
 
+        case FTags::TagDefineTimeline2:
+            return TEXT("TagDefineTimeline2");
+
         default:
-            return TEXT("This tag is not yet implemented");
+            return TEXT("This tag was not implemented");
         }
     }
 };

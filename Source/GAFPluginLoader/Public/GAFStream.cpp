@@ -182,13 +182,12 @@ void FGAFStream::CloseTag()
 
     const uint32 inputPosition = Input->GetPosition();
 
-    verify(record.expectedStreamPos == inputPosition);
+    //verify(record.expectedStreamPos == inputPosition);
 
     if (record.expectedStreamPos != inputPosition)
     {
-        //TODO : Log
-        //CCLOGERROR("Tag [%s] hasn't been correctly read, tag length is not respected. Expected [%d] but actually [%d]", 
-            //Tags::toString(record.tagType).c_str(), record.expectedStreamPos, inputPosition);
+        UE_LOG(LogGAFAsset, Log, TEXT("Tag [%s] wasn't read correctly, tag length is not respected. Expected [%d] but actually [%d]"),
+            *FTags::ToString(record.tagType), record.expectedStreamPos, inputPosition);
     }
 
     Input->Rewind(record.expectedStreamPos);

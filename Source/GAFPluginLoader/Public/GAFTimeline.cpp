@@ -78,6 +78,11 @@ void FGAFTimeline::SetLinkageName(const FString& linkageName)
     LinkageName = linkageName;
 }
 
+void FGAFTimeline::SetBaseClass(const FString& baseClass)
+{
+    BaseClass = baseClass;
+}
+
 const FGAFAnimationObjects_t& FGAFTimeline::GetAnimationObjects() const
 {
     return AnimationObjects;

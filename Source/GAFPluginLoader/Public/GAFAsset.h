@@ -2,6 +2,7 @@
 
 #include "GAFCollections.h"
 #include "GAFHeader.h"
+#include "ProceduralMeshComponent.h"
 
 #include "GAFAsset.generated.h"
 
@@ -22,6 +23,16 @@ private:
     void SetRootTimeline(FGAFTimelinePtr tl);
 
     void _InstantiateObject(uint32 id, FGAFCharacterType type, uint32 reference, bool mask, UBlueprint* BlueprintObject);
+
+
+    // It is temporary here
+    UFUNCTION(BlueprintCallable, Category = "Components|ProceduralMesh")
+        static void GenerateQuad(float w, float h,
+            TArray<FVector>& Vertices,
+            TArray<int32>& Triangles,
+            TArray<FVector>& Normals,
+            TArray<FVector2D>& UVs,
+            TArray<FProcMeshTangent>& Tangents);
 public:
 
     ~UGAFAsset();

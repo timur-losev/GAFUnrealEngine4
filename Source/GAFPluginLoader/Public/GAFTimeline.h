@@ -27,6 +27,7 @@ private:
     FColor                      SceneColor;
     uint32                      FramesCount;
     FString                     LinkageName;
+    FString                     BaseClass;
 
     FGAFTextureAtlas*           CurrentTextureAtlas = nullptr;
 
@@ -54,6 +55,7 @@ public:
     void                        SetSceneColor(const FColor&);
 
     void                        SetLinkageName(const FString& linkageName);
+    void                        SetBaseClass(const FString& baseClass);
 
     const FGAFAnimationObjects_t&   GetAnimationObjects() const;
     const FGAFAnimationMasks_t&     GetAnimationMasks() const;

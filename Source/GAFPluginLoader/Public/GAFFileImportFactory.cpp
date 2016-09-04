@@ -43,8 +43,6 @@ UObject* UGAFFileImportFactory::FactoryCreateBinary(UClass* InClass,
         InParent->GetOutermost()->GetPathName());
     UGAFAsset* resultObject = NewObject<UGAFAsset>(InParent, InName, Flags);
 
-    const FString CurrentFilename = UFactory::GetCurrentFilename();
-
     if (!resultObject->InitWithGAFData(Buffer, BufferEnd - Buffer, LongPackagePath))
         return nullptr;
 

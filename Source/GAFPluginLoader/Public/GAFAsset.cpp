@@ -7,10 +7,7 @@
 #include "GAFTextureAtlas.h"
 #include "GAFTextureAtlasElement.h"
 
-#include "ProceduralMeshComponent.h"
 #include "KismetProceduralMeshLibrary.h"
-
-
 
 DEFINE_LOG_CATEGORY(LogGAFAsset);
 
@@ -102,6 +99,53 @@ bool UGAFAsset::SetRootTimeline(uint32 id)
     return false;
 }
 
+
+void UGAFAsset::GenerateQuad(float w, float h, TArray<FVector>& Vertices, TArray<int32>& Triangles,
+    TArray<FVector>& Normals, TArray<FVector2D>& UVs, TArray<FProcMeshTangent>& Tangents)
+{
+    Vertices.Reset();
+    Triangles.Reset();
+    Normals.Reset();
+    UVs.Reset();
+    Tangents.Reset();
+
+    Vertices.AddUninitialized(4);
+    Normals.AddUninitialized(4);
+    Tangents.AddUninitialized(4);
+
+    // Generate verts
+    FVector QuadVerts[4];
+
+    /*
+    0,0        w,0
+    .     .
+
+    .     .
+    0,h        w,h
+    */
+
+    QuadVerts[0] = FVector(0.f, 0.f, 0.f);
+    QuadVerts[1] = FVector(w, 0.f, 0.f);
+    QuadVerts[2] = FVector(0.f, 0.f, h);
+    QuadVerts[3] = FVector(w, 0.f, h);
+
+    Vertices[0] = QuadVerts[0];
+    Vertices[1] = QuadVerts[1];
+    Vertices[2] = QuadVerts[2];
+    Vertices[3] = QuadVerts[3];
+
+    Triangles.Add(0);
+    Triangles.Add(1);
+    Triangles.Add(2);
+
+    Triangles.Add(3);
+    Triangles.Add(2);
+    Triangles.Add(1);
+
+    Normals[0] = Normals[1] = Normals[2] = Normals[3] = FVector(0, 0, 1);
+    Tangents[0] = Tangents[1] = Tangents[2] = Tangents[3] = FProcMeshTangent(0.f, -1.f, 0.f);
+}
+
 void UGAFAsset::_InstantiateObject(uint32 Id, FGAFCharacterType Type, uint32 Reference, bool Mask, UBlueprint* BlueprintObject)
 {
     if (Type == FGAFCharacterType::Timeline)
@@ -148,7 +192,7 @@ void UGAFAsset::_InstantiateObject(uint32 Id, FGAFCharacterType Type, uint32 Ref
             TArray<FVector> Normals;
             TArray<FVector2D> UVs;
             TArray<FProcMeshTangent> Tangents;
-            UKismetProceduralMeshLibrary::GenerateQuad(Element->Bounds.Size.Width, Element->Bounds.Size.Height, Vertices, Indeces, Normals, UVs, Tangents);
+            GenerateQuad(Element->Bounds.Size.Width, Element->Bounds.Size.Height, Vertices, Indeces, Normals, UVs, Tangents);
 
             UProceduralMeshComponent* ProceduralMesh = CastChecked<UProceduralMeshComponent>(ProceduralQuadNodeScriptNode->ComponentTemplate);
             ProceduralMesh->CreateMeshSection(0, Vertices, Indeces, Normals, UVs, TArray<FColor>(), Tangents, false);

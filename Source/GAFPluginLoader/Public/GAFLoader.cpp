@@ -19,6 +19,7 @@
 #include "Tags/GAFTagDefineSequences.h"
 #include "Tags/GAFTagDefineStage.h"
 #include "Tags/GAFTagDefineTimeline.h"
+#include "Tags/GAFTagDefineTimeline2.h"
 
 
 void FGAFLoader::ReadHeaderEnd(FGAFHeader& header)
@@ -74,6 +75,7 @@ void FGAFLoader::RegisterTagLoadersV4()
     TagLoaders.Add(FTags::TagDefineAtlas3, new FGAFTagDefineAtlas3());
     //TagLoaders[FTags::TagDefineTextFields] = new TagDefineTextField();
     TagLoaders.Add(FTags::TagDefineTimeline, new FGAFTagDefineTimeline(this));
+    TagLoaders.Add(FTags::TagDefineTimeline2, new FGAFTagDefineTimeline2(this));
     //TagLoaders[Tags::TagDefineSounds] = new TagDefineSounds();
 }
 

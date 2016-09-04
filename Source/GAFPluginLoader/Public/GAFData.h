@@ -17,7 +17,7 @@ private:
 public:
 
     template<typename T>
-    typename TEnableIf<TIsArithmeticType<T>::Value>::Type
+    typename TEnableIf<TIsArithmetic<T>::Value>::Type
         Read(T& InOut)
     {
         ReadBytes(&InOut, sizeof(T));
